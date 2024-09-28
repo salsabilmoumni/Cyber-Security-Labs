@@ -4,7 +4,7 @@ Welcome to my Cybersecurity Projects Repository! This repository contains a coll
 
 
 Projects Included:
-Home Lab for Elastic SIEM
-AWS Incident Response Lab
+Home Lab for Elastic SIEM, 
+AWS Incident Response Lab, 
 Malware Analysis Lab
 
