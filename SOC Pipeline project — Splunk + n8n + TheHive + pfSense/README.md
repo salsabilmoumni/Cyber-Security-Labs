@@ -50,7 +50,7 @@ This project simulates a real-world SOC environment deployed on cloud infrastruc
 ## 🏗️ Full Workflow
 
 
-> See [`screenshots/1.png`](screenshots/2.png) for the full workflow.
+![`screenshots/1.png`](screenshots/2.png)
 
 ---
 ## 🧰 Stack
@@ -102,11 +102,11 @@ Deploy pfSense on Vultr and configure a private VPC. Reference guide used: *"PFs
 
 **Set pfSense as the default gateway** on all VMs so every connection is routed through the firewall.
 
-> See [`screenshots/3.png`](screenshots/3.png), [`screenshots/4.png`](screenshots/4.png), <img width="457" height="806" alt="image" src="https://github.com/user-attachments/assets/0b47242f-46cc-4ceb-b4fc-f5a29c7f9a0f" />
+![`screenshots/3.png`](screenshots/3.png), ![`screenshots/4.png`](screenshots/4.png),![`screenshots/5.png`](screenshots/5.png)
 
 
 Thes status of the interfaces are up 
-> See [`screenshots/6.png`](screenshots/6.png) for the interfaces status.
+![`screenshots/6.png`](screenshots/6.png)
 
 ---
 
@@ -128,7 +128,7 @@ Get-WinEvent -ListLog "Microsoft-Windows-Sysmon/Operational"
 
 Sysmon captures: process creation, network connections, file operations, registry changes, and more.
 
-> See [`screenshots/7.png`](screenshots/7.png), [`screenshots/8.png`](screenshots/8.png)
+![`screenshots/7.png`](screenshots/7.png), ![`screenshots/8.png`](screenshots/8.png)
 
 ---
 
@@ -140,7 +140,7 @@ Sysmon captures: process creation, network connections, file operations, registr
 /opt/splunk/bin/splunk start
 # Web UI available at http://<SECURITY_IP>:8000
 ```
-> See [`screenshots/9.png`](screenshots/9.png), [`screenshots/10.png`](screenshots/10.png)
+![`screenshots/9.png`](screenshots/9.png), ![`screenshots/10.png`](screenshots/10.png)
 
 **Splunk Universal Forwarder** — install on all 3 Windows machines.
 
@@ -173,7 +173,7 @@ auditpol /set /subcategory:"Filtering Platform Connection" /success:enable /fail
 
 After configured the forwarder the splunk received the telemetries of the 3 victim machines
 
-> See [`screenshots/11.png`](screenshots/11.png)
+![`screenshots/11.png`](screenshots/11.png)
 
 ---
 
@@ -192,7 +192,7 @@ System Properties → Computer Name → Change → Domain: Moumni
 
 After confirming with credentials → "Welcome to the Moumni domain."
 
-> See [`screenshots/12.png`](screenshots/12.png), [`screenshots/13.png`](screenshots/13.png), [`screenshots/14.png`](screenshots/14.png)
+![`screenshots/12.png`](screenshots/12.png), ![`screenshots/13.png`](screenshots/13.png), ![`screenshots/14.png`](screenshots/14.png)
 
 ---
 
@@ -207,7 +207,7 @@ docker-compose up -d
 # Available at http://<SECURITY_IP>:9000
 ```
 
-> See [`screenshots/15.png`](screenshots/15.png)
+![`screenshots/15.png`](screenshots/15.png)
 
 ---
 
@@ -239,7 +239,7 @@ docker-compose up -d
 # Available at http://<SECURITY_IP>:5678
 ```
 
-> See [`screenshots/16.png`](screenshots/16.png)
+![`screenshots/16.png`](screenshots/16.png)
 
 ---
 
@@ -253,11 +253,12 @@ Three attack types are simulated:
 | 2 | RDP Brute Force | Hydra | 10.10.10.x |
 | 3 | Kerberoasting | Impacket GetUserSPNs | 10.10.10.x |
 
-> See [`screenshots/17.png`](screenshots/17.png)
+![`screenshots/17.png`](screenshots/17.png)
 
 Configure the n8n webhook to receive the splunk alert
 
-> See [`screenshots/19.png`](screenshots/19.png)
+![`screenshots/19.png`](screenshots/19.png)
+
 ---
 
 ## Phase 3 — Detection & Alerting
@@ -273,7 +274,8 @@ A **Switch node** routes alerts to the correct workflow branch based on `search_
 | External Threat | `search_name` contains `External Threat` | Full pipeline (VT + TheHive + Slack) |
 | Kerberoasting | `search_name` contains `Kerberoasting` | Slack + TheHive + Enrichment + Remediation |
 
-> See [`screenshots/21.png`](screenshots/21.png)
+![`screenshots/21.png`](screenshots/21.png)
+
 ---
 
 ### Attack 1 — Port Scan / Firewall Blocked Scanner
@@ -302,7 +304,7 @@ index=soc sourcetype=pfsense
 | head 3
 | eval list(src_ip) as top_attackers, sum(total_packets) as total_blocked_packets, count as unique_ips
 ```
-> See [`screenshots/18.png`](screenshots/18.png)
+![`screenshots/18.png`](screenshots/18.png)
 
 Alert fires when blocked traffic exceeds threshold → POST to n8n webhook.
 
@@ -310,7 +312,7 @@ Alert fires when blocked traffic exceeds threshold → POST to n8n webhook.
 
 The workflow of the External Threat - Firewall Blocked Scanners
 
-> See [`screenshots/20.png`](screenshots/20.png)
+![`screenshots/20.png`](screenshots/20.png)
 
 
 ```
@@ -328,25 +330,25 @@ Webhook (POST)
 ```
 **JavaScript Extraction Node**
 Extracts IPs from Splunk webhook payload before enrichment
-> See [`screenshots/22.png`](screenshots/22.png)
+![`screenshots/22.png`](screenshots/22.png)
 
 **VirusTotal Enrichment:**
 - Endpoint: `GET https://www.virustotal.com/api/v3/ip_addresses/{ip}`
 - Auth: `x-apikey` header
 - Fields used: `last_analysis_stats.malicious`, `country`, `as_owner`
 
-> See [`screenshots/23.png`](screenshots/23.png)
+![`screenshots/23.png`](screenshots/23.png)
 
 **IF Node**
 To classify if the ip is malicous or not
-> See [`screenshots/24.png`](screenshots/24.png)
+![`screenshots/24.png`](screenshots/24.png)
 
 **TheHive Case fields:**
 - Title: `External Threat - {ip}`
 - Severity: Medium
 - Tags: `ExternalThreat`, `{country}`, `VT-Malicious`
 - Observable: IP address (type: `ip`, TLP: Amber, IOC: true)
-> See [`screenshots/25.png`](screenshots/25.png), [`screenshots/26.png`](screenshots/26.png)
+![`screenshots/25.png`](screenshots/25.png), ![`screenshots/26.png`](screenshots/26.png)
 
 **Slack alert format:**
 ```
@@ -363,11 +365,11 @@ To classify if the ip is malicous or not
 Automated with this n8n workflow
 ```
 
-> See [`screenshots/27.png`](screenshots/27.png), [`screenshots/28.png`](screenshots/28.png)
+![`screenshots/27.png`](screenshots/27.png), ![`screenshots/28.png`](screenshots/28.png)
 
 ---
 **Add Observable (IOC) to TheHive**
-> See [`screenshots/29.png`](screenshots/29.png), [`screenshots/30.png`](screenshots/30.png)
+![`screenshots/29.png`](screenshots/29.png), ![`screenshots/30.png`](screenshots/30.png)
 
 
 ### Attack 2 — RDP Brute Force
@@ -391,7 +393,7 @@ index=soc sourcetype=WinEventLog EventCode=3389 DestinationPort=3389
 
 Fires alert when >50 RDP connection attempts are seen from a single source within 1 minute.
 
-> See [`screenshots/31.png`](screenshots/31.png)
+![`screenshots/31.png`](screenshots/31.png)
 
 **n8n Workflow:**
 
