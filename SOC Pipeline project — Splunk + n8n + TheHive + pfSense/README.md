@@ -405,11 +405,11 @@ Webhook (POST)
               Tags: RDP, BruteForce, T1110.001
               Description: Attacker IP, Target IP, Attempt count
 ```
-> See [`screenshots/32.png`](screenshots/32.png)
+![`screenshots/32.png`](screenshots/32.png)
 
 **TheHive Case**
 
-> See [`screenshots/33.png`](screenshots/33.png), [`screenshots/34.png`](screenshots/34.png)
+![`screenshots/33.png`](screenshots/33.png), ![`screenshots/34.png`](screenshots/34.png)
 
 **Slack notification format:**
 ```
@@ -422,7 +422,7 @@ Search: RDP Brute Force Detected
 Automated with this n8n workflow
 ```
 
-> See [`screenshots/35.png`](screenshots/35.png) through [`screenshots/36.png`](screenshots/36.png)
+ ![`screenshots/35.png`](screenshots/35.png)  ![`screenshots/36.png`](screenshots/36.png)
 
 ---
 
@@ -478,6 +478,8 @@ index=soc EventCode=4769
 | table _time, Account_Name, Service_Name, Client_Address, Ticket_Encryption_Type
 | sort -_time
 ```
+![`screenshots/37.png`](screenshots/37.png)
+
 
 - Monitors **Event ID 4769** (Kerberos Service Ticket Request)
 - Triggers on **RC4 encryption (`0x17`)** — the primary Kerberoasting indicator
@@ -522,8 +524,41 @@ Webhook (POST)
                                       - 🚫 Click to Disable AD User  (link → Webhook2)
                                       - 🔑 Click to Reset Service Password (link → Webhook1)
 ```
+![`screenshots/38.png`](screenshots/38.png)
 
-**Slack action message format:**
+**Quick Notifcation from slack**
+
+![`screenshots/39.png`](screenshots/39.png)
+![`screenshots/40.png`](screenshots/40.png)
+
+**Imidaite Case Creation in TheHive**
+
+![`screenshots/41.png`](screenshots/41.png)
+![`screenshots/42.png`](screenshots/42.png)
+
+**Splunk Enrichment**
+
+Query pulls last 24h of activity for the compromised account:
+-TGS/TGT request counts
+-Successful/failed logon counts
+-Account modifications
+-Risk level assessment (CRITICAL/HIGH/MEDIUM)
+-Critical flags (account creation, password reset, etc.
+
+![`screenshots/43.png`](screenshots/43.png)
+
+**Edit Fields**
+
+Extract Fields from splunk for enrichment
+
+![`screenshots/44.png`](screenshots/44.png)
+
+All data is added to the TheHive case description as a structured enrichment summary
+
+The case is uppdated
+![`screenshots/45.png`](screenshots/45.png)
+
+**Action Required (HTTP Request → Slack API)**
 ```
 🚨 Kerberoasting Detected — Action Required
 User: joedoe@MOUMNI.LOCAL
@@ -536,7 +571,8 @@ Remediation Actions:
 🔑 Click to Reset Service Password
 ```
 
-> See [`screenshots/24.png`](screenshots/24.png) through [`screenshots/31.png`](screenshots/31.png)
+![`screenshots/46.png`](screenshots/46.png)
+![`screenshots/47.png`](screenshots/47.png)
 
 ---
 
@@ -571,6 +607,8 @@ python C:\ad_api.py
 - **Disable:** sets `userAccountControl = 514` via `Disable-ADAccount`
 - **Reset:** generates random password via `Set-ADAccountPassword`
 
+![`screenshots/48.png`](screenshots/48.png)
+
 ### Remediation Pipeline in n8n
 
 ```
@@ -582,19 +620,13 @@ Webhook1 (GET /reset-password?username=X)
   └── Reset_Password (POST → Flask API /reset-password)
         └── Confirm_Reset_Password (Slack confirmation with new password)
 ```
-
+![`screenshots/49.png`](screenshots/49.png)
 Both webhooks are permanently published. The analyst simply **clicks a link in Slack** → browser opens → webhook fires → PowerShell executes on the AD server → Slack confirms.
 
 **Confirmation messages:**
-```
-✅ User has been disabled in Active Directory
-Automated with this n8n workflow
+![`screenshots/51.png`](screenshots/51.png)
 
-✅ Password for svc_http has been reset
-New Password: eXe*6e%bxSM8DCaBzub937&9b
-Delete this message after sharing with service owner
-Automated with this n8n workflow
-```
+![`screenshots/52.png`](screenshots/52.png)
 
 
 ## 🔗 References
