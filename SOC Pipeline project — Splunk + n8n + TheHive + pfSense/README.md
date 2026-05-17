@@ -42,7 +42,7 @@ This project simulates a real-world SOC environment deployed on cloud infrastruc
 ## 🏗️ Architecture
 
 
-[`screenshots/1.png`](screenshots/1.png)
+![screenshots/1.png](screenshots/1.png)
 
 ---
 ---
