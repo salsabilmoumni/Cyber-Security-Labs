@@ -1,6 +1,9 @@
- 🛡️ Automated SOC Pipeline — pfSense + Splunk + n8n + TheHive
+# 🛡️ Automated SOC Pipeline — pfSense + Splunk + n8n + TheHive
 
-> A fully automated Security Operations Center (SOC) pipeline built entirely on open-source tools. Threats are detected by Splunk, enriched via VirusTotal, triaged in TheHive, and analysts are notified — and can take remediation action — directly from Slack.
+> A fully automated Security Operations Center (SOC) pipeline built entirely on open-source tools.  
+> Threats are detected by Splunk, enriched via VirusTotal, triaged in TheHive, and analysts are notified — and can take remediation action — directly from Slack.
+
+**Author:** [salsabilmoumni](https://github.com/salsabilmoumni)
 
 ---
 
@@ -11,19 +14,18 @@
 - [Stack](#-stack)
 - [Network Layout](#-network-layout)
 - [Phase 1 — Installation & Configuration](#phase-1--installation--configuration)
-  - [pfSense Setup](#1-pfsense-setup)
-  - [Sysmon](#2-sysmon)
-  - [Splunk](#3-splunk)
-  - [Active Directory](#4-active-directory)
-  - [TheHive](#5-thehive)
-  - [n8n](#6-n8n)
+  - [1. pfSense Setup](#1-pfsense-setup)
+  - [2. Sysmon](#2-sysmon)
+  - [3. Splunk](#3-splunk)
+  - [4. Active Directory](#4-active-directory)
+  - [5. TheHive](#5-thehive)
+  - [6. n8n](#6-n8n)
 - [Phase 2 — Attack Simulations](#phase-2--attack-simulations)
 - [Phase 3 — Detection & Alerting](#phase-3--detection--alerting)
   - [Attack 1 — Port Scan / Firewall Blocked Scanner](#attack-1--port-scan--firewall-blocked-scanner)
   - [Attack 2 — RDP Brute Force](#attack-2--rdp-brute-force)
   - [Attack 3 — Kerberoasting](#attack-3--kerberoasting)
 - [Phase 4 — Incident Response & Remediation](#phase-4--incident-response--remediation)
-- [Screenshots](#-screenshots)
 - [References](#-references)
 
 ---
@@ -35,24 +37,22 @@ This project simulates a real-world SOC environment deployed on cloud infrastruc
 1. Attackers perform real attacks (port scan, RDP brute force, Kerberoasting)
 2. Splunk detects anomalies and fires webhook alerts
 3. n8n orchestrates the response: enriches IOCs via VirusTotal, opens cases in TheHive, and notifies analysts on Slack
-4. Analysts can trigger one-click remediation (disable user / reset password) directly from Slack
+4. Analysts trigger one-click remediation (disable user / reset password) directly from Slack
 
 ---
 
 ## 🏗️ Architecture
 
-
-![screenshots/1.png](screenshots/1.png)
-
----
----
-
-## 🏗️ Full Workflow
-
-
-![`screenshots/1.png`](screenshots/2.png)
+![Architecture Diagram](screenshots/1.png)
 
 ---
+
+## 🔄 Full Workflow
+
+![Full Workflow](screenshots/2.png)
+
+---
+
 ## 🧰 Stack
 
 | Tool | Role | Port |
@@ -87,9 +87,10 @@ Firewall rules allow traffic between all segments through pfSense (which acts as
 
 ### 1. pfSense Setup
 
-Deploy pfSense on Vultr and configure a private VPC. Reference guide used: *"PFsense setup on Vultr with private LAN — Jarrod's Tech"*.
+Deploy pfSense on Vultr and configure a private VPC.  
+Reference guide: *"PFsense setup on Vultr with private LAN — Jarrod's Tech"*
 
-**Create interfaces:**
+**Interfaces:**
 
 | Interface | IP |
 |-----------|-----|
@@ -102,11 +103,13 @@ Deploy pfSense on Vultr and configure a private VPC. Reference guide used: *"PFs
 
 **Set pfSense as the default gateway** on all VMs so every connection is routed through the firewall.
 
-![`screenshots/3.png`](screenshots/3.png), ![`screenshots/4.png`](screenshots/4.png),![`screenshots/5.png`](screenshots/5.png)
+![pfSense Firewall Rules - ATTACKER](screenshots/3.png)
+![pfSense Firewall Rules - SECURITY & VICTIM](screenshots/4.png)
+![pfSense Interface Configuration](screenshots/5.png)
 
+Interface status — all up:
 
-Thes status of the interfaces are up 
-![`screenshots/6.png`](screenshots/6.png)
+![pfSense Interface Status](screenshots/6.png)
 
 ---
 
@@ -121,14 +124,15 @@ Install **Sysmon v15.2** on all three Windows machines (DC + 2 clients).
 # Install Sysmon with config
 .\Sysmon64.exe -i .\sysmonconfig.xml
 
-# Verify
+# Verify installation
 Get-Service Sysmon64
 Get-WinEvent -ListLog "Microsoft-Windows-Sysmon/Operational"
 ```
 
 Sysmon captures: process creation, network connections, file operations, registry changes, and more.
 
-![`screenshots/7.png`](screenshots/7.png), ![`screenshots/8.png`](screenshots/8.png)
+![Sysmon Installation Output](screenshots/7.png)
+![Sysmon Service Running](screenshots/8.png)
 
 ---
 
@@ -140,11 +144,12 @@ Sysmon captures: process creation, network connections, file operations, registr
 /opt/splunk/bin/splunk start
 # Web UI available at http://<SECURITY_IP>:8000
 ```
-![`screenshots/9.png`](screenshots/9.png), ![`screenshots/10.png`](screenshots/10.png)
 
-**Splunk Universal Forwarder** — install on all 3 Windows machines.
+![Splunk Start](screenshots/9.png)
+![Splunk Web UI Login](screenshots/10.png)
 
-Configure `inputs.conf` at:
+**Splunk Universal Forwarder** — install on all 3 Windows machines and configure `inputs.conf`:
+
 ```
 C:\Program Files\SplunkUniversalForwarder\etc\system\local\inputs.conf
 ```
@@ -159,21 +164,23 @@ index = soc
 disabled = 0
 ```
 
-> ⚠️ Common issue: the default `inputs.conf` gets copied to local. Replace it with the minimal clean version above, then restart:
+> ⚠️ **Common issue:** the default `inputs.conf` gets copied to local. Replace it with the minimal clean version above, then restart:
 
 ```powershell
 Restart-Service SplunkForwarder
 ```
 
-**Windows Audit Policy** — enable on all machines:
+**Windows Audit Policy** — enable on all machines to generate connection events:
 
 ```cmd
 auditpol /set /subcategory:"Filtering Platform Connection" /success:enable /failure:enable
 ```
 
-After configured the forwarder the splunk received the telemetries of the 3 victim machines
+This generates **EventCode 5156** (connection allowed) and **EventCode 5157** (connection blocked).
 
-![`screenshots/11.png`](screenshots/11.png)
+After configuring the forwarder, Splunk receives telemetry from all 3 victim machines:
+
+![Splunk Receiving Telemetry from 3 VMs](screenshots/11.png)
 
 ---
 
@@ -184,15 +191,12 @@ Install **Active Directory Domain Services** on the Windows Server VM (hostname:
 **Steps:**
 1. Server Manager → Add Roles → Active Directory Domain Services
 2. Promote to Domain Controller, create domain `Moumni.local`
-3. On Windows-C1 and Windows-C2: set DNS to the DC's IP (`10.10.20.5`), then join the domain
+3. On Windows-C1 and Windows-C2: set Preferred DNS to the DC IP (`10.10.20.5`)
+4. Join the domain: `System Properties → Computer Name → Change → Domain: Moumni`
 
-```
-System Properties → Computer Name → Change → Domain: Moumni
-```
-
-After confirming with credentials → "Welcome to the Moumni domain."
-
-![`screenshots/12.png`](screenshots/12.png), ![`screenshots/13.png`](screenshots/13.png), ![`screenshots/14.png`](screenshots/14.png)
+![AD Role Selection](screenshots/12.png)
+![DNS Configuration for Domain Join](screenshots/13.png)
+![Successfully Joined Domain](screenshots/14.png)
 
 ---
 
@@ -202,20 +206,17 @@ Install **TheHive 5** using Docker:
 
 ```bash
 docker pull strangebee/thehive:5
-# or use docker-compose
 docker-compose up -d
 # Available at http://<SECURITY_IP>:9000
 ```
 
-![`screenshots/15.png`](screenshots/15.png)
+![TheHive Login Page](screenshots/15.png)
 
 ---
 
 ### 6. n8n
 
-Install **n8n** using Docker Compose.
-
-`docker-compose.yml`:
+Install **n8n** using Docker Compose:
 
 ```yaml
 services:
@@ -239,32 +240,32 @@ docker-compose up -d
 # Available at http://<SECURITY_IP>:5678
 ```
 
-![`screenshots/16.png`](screenshots/16.png)
+![n8n Dashboard](screenshots/16.png)
 
 ---
 
 ## Phase 2 — Attack Simulations
 
-Three attack types are simulated:
+Three attack types are simulated from the Kali attacker machine:
 
 | # | Attack | Tool | Source |
 |---|--------|------|--------|
-| 1 | Port Scan / Host Sweep | nmap / Kali | 10.10.10.x |
+| 1 | Port Scan / Host Sweep | nmap / pfSense blocked traffic | 10.10.10.x |
 | 2 | RDP Brute Force | Hydra | 10.10.10.x |
 | 3 | Kerberoasting | Impacket GetUserSPNs | 10.10.10.x |
 
-![`screenshots/17.png`](screenshots/17.png)
+![Splunk Saved Searches — 3 Alert Rules](screenshots/17.png)
 
-Configure the n8n webhook to receive the splunk alert
+Configure the n8n webhook to receive the Splunk alerts:
 
-![`screenshots/19.png`](screenshots/19.png)
+![n8n Webhook Node Configuration](screenshots/19.png)
 
 ---
 
 ## Phase 3 — Detection & Alerting
 
-All three Splunk saved searches fire webhook POSTs to n8n. 
-A **Switch node** routes alerts to the correct workflow branch based on `search_name`.
+All three Splunk saved searches fire webhook POSTs to n8n.  
+A **Switch node** routes each alert to the correct workflow branch based on `search_name`.
 
 **Switch Rules:**
 
@@ -274,7 +275,7 @@ A **Switch node** routes alerts to the correct workflow branch based on `search_
 | External Threat | `search_name` contains `External Threat` | Full pipeline (VT + TheHive + Slack) |
 | Kerberoasting | `search_name` contains `Kerberoasting` | Slack + TheHive + Enrichment + Remediation |
 
-![`screenshots/21.png`](screenshots/21.png)
+![n8n Switch Node Rules](screenshots/21.png)
 
 ---
 
@@ -282,7 +283,7 @@ A **Switch node** routes alerts to the correct workflow branch based on `search_
 
 Detects any IP performing a port scan or host sweep that pfSense blocks — covers both external internet scanners and internal Kali attacks.
 
-**Splunk Detection Query (`soc` index, source `pfsense`):**
+**Splunk Detection Query:**
 
 ```spl
 index=soc sourcetype=pfsense
@@ -304,16 +305,14 @@ index=soc sourcetype=pfsense
 | head 3
 | eval list(src_ip) as top_attackers, sum(total_packets) as total_blocked_packets, count as unique_ips
 ```
-![`screenshots/18.png`](screenshots/18.png)
+
+![Splunk — External Threat Detection Results](screenshots/18.png)
 
 Alert fires when blocked traffic exceeds threshold → POST to n8n webhook.
 
 **n8n Workflow Logic:**
 
-The workflow of the External Threat - Firewall Blocked Scanners
-
-![`screenshots/20.png`](screenshots/20.png)
-
+![n8n — External Threat Workflow](screenshots/20.png)
 
 ```
 Webhook (POST)
@@ -328,49 +327,53 @@ Webhook (POST)
                                 │         → Slack Alert 🚨
                                 └── FALSE → Stop (IP is clean)
 ```
-**JavaScript Extraction Node**
-Extracts IPs from Splunk webhook payload before enrichment
-![`screenshots/22.png`](screenshots/22.png)
 
-**VirusTotal Enrichment:**
+**JavaScript Extraction Node** — extracts IPs from Splunk webhook payload before enrichment:
+
+![JavaScript Extraction Node](screenshots/22.png)
+
+**VirusTotal Enrichment Node:**
 - Endpoint: `GET https://www.virustotal.com/api/v3/ip_addresses/{ip}`
 - Auth: `x-apikey` header
 - Fields used: `last_analysis_stats.malicious`, `country`, `as_owner`
 
-![`screenshots/23.png`](screenshots/23.png)
+![VirusTotal Node Configuration](screenshots/23.png)
 
-**IF Node**
-To classify if the ip is malicous or not
-![`screenshots/24.png`](screenshots/24.png)
+**IF Node** — classifies whether the IP is malicious:
 
-**TheHive Case fields:**
+![IF Node Configuration](screenshots/24.png)
+
+**TheHive Case Creation:**
 - Title: `External Threat - {ip}`
 - Severity: Medium
 - Tags: `ExternalThreat`, `{country}`, `VT-Malicious`
-- Observable: IP address (type: `ip`, TLP: Amber, IOC: true)
-![`screenshots/25.png`](screenshots/25.png), ![`screenshots/26.png`](screenshots/26.png)
 
-**Slack alert format:**
+![TheHive Case Node Config](screenshots/25.png)
+![TheHive Case Created Successfully](screenshots/26.png)
+
+**Slack Alert:**
+
 ```
 🚨 *External Threat Detected*
 *IP:* 194.59.206.2
 *Search:* External Threat - Firewall Blocked Scanners
-*Total Packets:* 5
-*Unique IPs:* 1
+*Total Packets:* 5  |  *Unique IPs:* 1
 *VirusTotal Verdict:*
-- Malicious: 7 - Suspicious: 4
-- AS Owner: netcup GmbH
-- Country: DE
+  - Malicious: 7  |  Suspicious: 4
+  - AS Owner: netcup GmbH  |  Country: DE
 🔗 VT Link: https://www.virustotal.com/gui/ip-address/194.59.206.2
 Automated with this n8n workflow
 ```
 
-![`screenshots/27.png`](screenshots/27.png), ![`screenshots/28.png`](screenshots/28.png)
+![Slack Node Configuration](screenshots/27.png)
+![Slack Alert Received](screenshots/28.png)
+
+**Add Observable (IOC) to TheHive** — IP added with type `ip`, TLP: Amber, IOC: true:
+
+![Observable Node Configuration](screenshots/29.png)
+![Observable Added Successfully](screenshots/30.png)
 
 ---
-**Add Observable (IOC) to TheHive**
-![`screenshots/29.png`](screenshots/29.png), ![`screenshots/30.png`](screenshots/30.png)
-
 
 ### Attack 2 — RDP Brute Force
 
@@ -391,9 +394,9 @@ index=soc sourcetype=WinEventLog EventCode=3389 DestinationPort=3389
 | where count > 50
 ```
 
-Fires alert when >50 RDP connection attempts are seen from a single source within 1 minute.
+Fires alert when >50 RDP connection attempts from a single source within 1 minute.
 
-![`screenshots/31.png`](screenshots/31.png)
+![Splunk — RDP Brute Force Detection Results](screenshots/31.png)
 
 **n8n Workflow:**
 
@@ -402,29 +405,32 @@ Webhook (POST)
   └── Switch → RDP Brute Force branch
         ├── Send Slack message (immediate alert)
         └── Create TheHive Case
-              Title: "RDP Brute Force - {SourceIp}"
+              Title:    "RDP Brute Force - {SourceIp}"
               Severity: High
-              Tags: RDP, BruteForce, T1110.001
-              Description: Attacker IP, Target IP, Attempt count
+              Tags:     RDP, BruteForce, T1110.001
 ```
-![`screenshots/32.png`](screenshots/32.png)
 
-**TheHive Case**
+![n8n — RDP Workflow Diagram](screenshots/32.png)
 
-![`screenshots/33.png`](screenshots/33.png), ![`screenshots/34.png`](screenshots/34.png)
+**TheHive Case:**
 
-**Slack notification format:**
+![TheHive Case Node Config — RDP](screenshots/33.png)
+![TheHive Case Created — RDP Brute Force](screenshots/34.png)
+
+**Slack Notification:**
+
 ```
 🚨 [HIGH] RDP Brute Force Detected
 Attacker IP: 10.10.10.4
-Target IP: 10.10.20.4
-Attempts: 76
-Search: RDP Brute Force Detected
+Target IP:   10.10.20.4
+Attempts:    76
+Search:      RDP Brute Force Detected
 🔗 Splunk Link: http://...
 Automated with this n8n workflow
 ```
 
- ![`screenshots/35.png`](screenshots/35.png)  ![`screenshots/36.png`](screenshots/36.png)
+![Slack Node Config — RDP](screenshots/35.png)
+![Slack Notification Received — RDP](screenshots/36.png)
 
 ---
 
@@ -446,7 +452,7 @@ New-ADUser -Name "svc_http" -SamAccountName "svc_http" `
 # Register SPN
 setspn -A HTTP/webserver.Moumni.local svc_http
 
-# Enable RC4 encryption (makes it vulnerable)
+# Enable RC4 encryption (makes it vulnerable to Kerberoasting)
 Set-ADUser svc_http -KerberosEncryptionType RC4
 
 # Verify
@@ -458,8 +464,7 @@ setspn -L svc_http
 ```bash
 # Install Impacket
 git clone https://github.com/fortra/impacket.git
-cd impacket
-pip install . --break-system-packages
+cd impacket && pip install . --break-system-packages
 
 # Enumerate SPNs
 python3 /usr/local/bin/GetUserSPNs.py Moumni.local/joedoe:Password123 -dc-ip 10.10.20.5
@@ -480,101 +485,92 @@ index=soc EventCode=4769
 | table _time, Account_Name, Service_Name, Client_Address, Ticket_Encryption_Type
 | sort -_time
 ```
-![`screenshots/37.png`](screenshots/37.png)
-
 
 - Monitors **Event ID 4769** (Kerberos Service Ticket Request)
 - Triggers on **RC4 encryption (`0x17`)** — the primary Kerberoasting indicator
 - Payload sent to n8n: `Account_Name`, `Service_Name`, `IpAddress`, `Ticket_Encryption_Type`, MITRE tag
+
+![Splunk — Kerberoasting Detection (Event ID 4769)](screenshots/37.png)
 
 #### n8n Workflow — Kerberoasting Branch
 
 ```
 Webhook (POST)
   └── Switch → Kerberoasting branch
-        ├── Send Slack message (immediate analyst alert)
-        │     - User, Service Account, Source IP
-        │     - Encryption Type, Severity: HIGH
-        │     - MITRE ATT&CK: T1558.003
-        │     - Splunk investigation link
-        │     - Recommended actions
+        ├── Send Slack message (immediate alert)
+        │     Fields: User, Service Account, Source IP,
+        │             Encryption Type, Severity: HIGH
+        │             MITRE ATT&CK: T1558.003
+        │             Splunk link + Recommended actions
         │
-        └── Create TheHive Case (immediate)
-              Title: "Kerberoasting attempt Detected - {Account_Name}"
-              Severity: High
-              Tags: T1558.003
-              TLP/PAP: Amber
+        └── Create TheHive Case
+              Title:    "Kerberoasting attempt Detected - {Account_Name}"
+              Severity: High  |  Tags: T1558.003  |  TLP/PAP: Amber
               │
               └── Enrich with Splunk (last 24h activity for the account)
-                    POST http://10.10.30.3:8089/services/search/jobs
-                    Query: EventCodes 4768/4769/4624/4625/4720/4722/4724/4738
+                    EventCodes: 4768/4769/4624/4625/4720/4722/4724/4738
                     │
                     └── Edit Fields (JavaScript)
-                          Computes:
                           - tgsCount, tgtCount
                           - logonSuccess, logonFailed
-                          - accountCreated, passwordReset
-                          - accountModified
+                          - accountCreated, passwordReset, accountModified
                           - riskLevel (CRITICAL / HIGH / MEDIUM)
-                          - criticalFlags[]
-                          - enrichmentSummary (markdown)
+                          - criticalFlags[], enrichmentSummary
                           │
-                          └── Update TheHive Case (add enrichment to description)
+                          └── Update TheHive Case (append enrichment)
                                 │
-                                └── HTTP Request → Slack API (action-required message)
-                                      - Enriched data (TGS count, risk level)
-                                      - 🚫 Click to Disable AD User  (link → Webhook2)
-                                      - 🔑 Click to Reset Service Password (link → Webhook1)
+                                └── HTTP Request → Slack API
+                                      - TGS count, risk level
+                                      - 🚫 Click to Disable AD User
+                                      - 🔑 Click to Reset Service Password
 ```
-![`screenshots/38.png`](screenshots/38.png)
 
-**Quick Notifcation from slack**
+![n8n — Full Kerberoasting Workflow](screenshots/38.png)
 
-![`screenshots/39.png`](screenshots/39.png)
-![`screenshots/40.png`](screenshots/40.png)
+**Immediate Slack Notification:**
 
-**Imidaite Case Creation in TheHive**
+![Slack Quick Notification — Kerberoasting](screenshots/39.png)
+![Slack Message Detail](screenshots/40.png)
 
-![`screenshots/41.png`](screenshots/41.png)
-![`screenshots/42.png`](screenshots/42.png)
+**Immediate TheHive Case Creation:**
 
-**Splunk Enrichment**
+![TheHive Case Node Config — Kerberoasting](screenshots/41.png)
+![TheHive Case Created — Kerberoasting](screenshots/42.png)
 
-Query pulls last 24h of activity for the compromised account:
--TGS/TGT request counts
--Successful/failed logon counts
--Account modifications
--Risk level assessment (CRITICAL/HIGH/MEDIUM)
--Critical flags (account creation, password reset, etc.
+**Splunk Enrichment** — query pulls last 24h of activity for the compromised account:
 
-![`screenshots/43.png`](screenshots/43.png)
+- TGS/TGT request counts
+- Successful/failed logon counts
+- Account modifications
+- Risk level assessment (CRITICAL / HIGH / MEDIUM)
+- Critical flags (account creation, password reset, etc.)
 
-**Edit Fields**
+![Splunk Enrichment Node Configuration](screenshots/43.png)
 
-Extract Fields from splunk for enrichment
+**Edit Fields (JavaScript)** — extracts and computes enrichment fields:
 
-![`screenshots/44.png`](screenshots/44.png)
+![Edit Fields — JavaScript Code](screenshots/44.png)
 
-All data is added to the TheHive case description as a structured enrichment summary
+All enrichment data is added to the TheHive case description. The case is updated:
 
-The case is uppdated
-![`screenshots/45.png`](screenshots/45.png)
+![TheHive Case Updated with Enrichment](screenshots/45.png)
 
-**Action Required (HTTP Request → Slack API)**
+**Action Required message sent to Slack:**
+
 ```
 🚨 Kerberoasting Detected — Action Required
-User: joedoe@MOUMNI.LOCAL
+User:            joedoe@MOUMNI.LOCAL
 Service Account: svc_http
-TGS Requests: 15
-Risk Level: CRITICAL
+TGS Requests:    15
+Risk Level:      CRITICAL
 
 Remediation Actions:
 🚫 Click to Disable AD User
 🔑 Click to Reset Service Password
 ```
 
-![`screenshots/46.png`](screenshots/46.png)
-![`screenshots/47.png`](screenshots/47.png)
+![Slack Action Message Node Config](screenshots/46.png)
+![Slack Action Required Message Received](screenshots/47.png)
 
 ---
 
@@ -601,15 +597,15 @@ python C:\ad_api.py
 | `/reset-password` | POST | Reset password via `Set-ADAccountPassword` |
 
 **Security:**
-- API key authentication (`X-API-Key` header)
-- New passwords generated randomly (25 chars, mixed charset)
+- API key authentication via `X-API-Key` header
+- Passwords generated randomly (25 chars, mixed charset)
 - New password sent to Slack `#alerts` channel after reset
 
 **AD Actions:**
 - **Disable:** sets `userAccountControl = 514` via `Disable-ADAccount`
 - **Reset:** generates random password via `Set-ADAccountPassword`
 
-![`screenshots/48.png`](screenshots/48.png)
+![Flask API Running on AD Server](screenshots/48.png)
 
 ### Remediation Pipeline in n8n
 
@@ -620,16 +616,22 @@ Webhook2 (GET /disable-user?username=X)
 
 Webhook1 (GET /reset-password?username=X)
   └── Reset_Password (POST → Flask API /reset-password)
-        └── Confirm_Reset_Password (Slack confirmation with new password)
+        └── Confirm_Reset_Password (Slack confirmation + new password)
 ```
-![`screenshots/49.png`](screenshots/49.png)
+
+![Remediation Webhooks in n8n](screenshots/49.png)
+
 Both webhooks are permanently published. The analyst simply **clicks a link in Slack** → browser opens → webhook fires → PowerShell executes on the AD server → Slack confirms.
 
-**Confirmation messages:**
-![`screenshots/51.png`](screenshots/51.png)
+**User Disabled Confirmation:**
 
-![`screenshots/52.png`](screenshots/52.png)
+![AD — joe doe User Disabled](screenshots/51.png)
 
+**Password Reset Confirmation:**
+
+![Slack — Password Reset Confirmation](screenshots/52.png)
+
+---
 
 ## 🔗 References
 
@@ -644,3 +646,5 @@ Both webhooks are permanently published. The analyst simply **clicks a link in S
 - [MITRE ATT&CK T1110.001 — Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
 
 ---
+
+<p align="center">Built by <a href="https://github.com/salsabilmoumni">salsabilmoumni</a></p>
