@@ -1,4 +1,4 @@
-<img width="907" height="463" alt="image" src="https://github.com/user-attachments/assets/aaba85c6-a627-4e94-b038-39c4a106d701" /><img width="873" height="475" alt="image" src="https://github.com/user-attachments/assets/5edbca39-70da-4ab2-bcb3-1805f314e7b3" /># 🛡️ Automated SOC Pipeline — pfSense + Splunk + n8n + TheHive
+ 🛡️ Automated SOC Pipeline — pfSense + Splunk + n8n + TheHive
 
 > A fully automated Security Operations Center (SOC) pipeline built entirely on open-source tools. Threats are detected by Splunk, enriched via VirusTotal, triaged in TheHive, and analysts are notified — and can take remediation action — directly from Slack.
 
