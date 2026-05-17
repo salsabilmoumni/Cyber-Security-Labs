@@ -3,7 +3,7 @@
 > A fully automated Security Operations Center (SOC) pipeline built entirely on open-source tools.  
 > Threats are detected by Splunk, enriched via VirusTotal, triaged in TheHive, and analysts are notified — and can take remediation action — directly from Slack.
 
-**Author:** [salsabilmoumni](https://github.com/salsabilmoumni)
+
 
 ---
 
@@ -647,4 +647,4 @@ Both webhooks are permanently published. The analyst simply **clicks a link in S
 
 ---
 
-<p align="center">Built by <a href="https://github.com/salsabilmoumni">salsabilmoumni</a></p>
+
