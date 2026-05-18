@@ -210,7 +210,7 @@ The email subject reads **[HIGH] Credential Dumping Detected** and includes the 
 
 ### 5. TheHive — Create Case
 
-A TheHive case is created automatically via the API with severity, tags (`mimikatz`, `T1003`, `lsass`, `credential-dumping`), and a rich description populated from the VirusTotal enrichment results.
+A TheHive case is created automatically via the API with severity, tags (`mimikatz`, `T1003`, `lsass`, `credential-dumping`), and a  description.
 
 ![TheHive Create Case Node](screenshots/16.png)
 
@@ -251,33 +251,6 @@ Mimikatz runs on Windows endpoint
                                             └──▶ TheHive case created with SHA256 observable
 ```
 
----
-
-## 💡 Lessons Learned
-
-**1. SOAR dramatically reduces analyst toil.**  
-Tasks that would take a SOC analyst several minutes (looking up a hash, opening a ticket, notifying the team) happen in seconds automatically. This is the core value proposition of a SOAR platform.
-
-**2. Sysmon configuration quality determines detection quality.**  
-Using a well-tuned community config (olafhartong/sysmon-modular) is far better than the defaults. The schema version matters — always match your config to your Sysmon binary version.
-
-**3. VPC networking requires manual adapter configuration on Windows.**  
-Vultr assigns the VPC IP but Windows won't use it automatically — the network adapter properties must be updated manually with the correct static IP, subnet, and gateway.
-
-**4. Defender exclusions are a real attacker technique.**  
-Excluding the Downloads folder to run Mimikatz is exactly what attackers do in the real world. Detection engineers should monitor for Defender exclusion creation events.
-
-**5. VirusTotal reputation is not binary.**  
-A hash can have a low malicious count but still be suspicious. Enrichment context (vendor labels, community votes, file metadata) should be part of the triage, not just the score.
-
-**6. TheHive observables enable faster triage.**  
-Attaching the SHA256 hash as a typed observable (not just text in a description) allows analysts to pivot to other cases involving the same indicator.
-
-**7. Webhook security matters.**  
-In production, Shuffle webhook endpoints should be protected with authentication headers to prevent spoofed alert injection.
-
----
-
 ## 🔗 References
 
 - [Sysmon — Sysinternals](https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon)
@@ -289,4 +262,4 @@ In production, Shuffle webhook endpoints should be protected with authentication
 
 ---
 
-*Part of the [Cyber-Security-Labs](../) series.*
+
