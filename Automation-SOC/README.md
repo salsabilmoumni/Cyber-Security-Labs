@@ -194,7 +194,7 @@ Install **Active Directory Domain Services** on the Windows Server VM (hostname:
 3. On Windows-C1 and Windows-C2: set Preferred DNS to the DC IP (`10.10.20.5`)
 4. Join the domain: `System Properties → Computer Name → Change → Domain: Moumni`
 
-![AD Role Selection](screenshots/12.png)
+
 ![DNS Configuration for Domain Join](screenshots/13.png)
 ![Successfully Joined Domain](screenshots/14.png)
 
