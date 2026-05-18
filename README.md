@@ -1,5 +1,4 @@
 # 🔐 Cyber Security Labs
-
 Hands-on cybersecurity projects covering SIEM engineering, SOC automation, cloud incident response, and malware analysis.  
 Each lab is fully documented with tools, commands, configurations, findings, and MITRE ATT&CK mappings.
 
@@ -10,6 +9,7 @@ Each lab is fully documented with tools, commands, configurations, findings, and
 | Project | Focus | Tools | Difficulty |
 |---------|-------|-------|------------|
 | [Automated SOC Pipeline](./Automation-SOC/) | End-to-end SOC automation — threat detection, IOC enrichment, case management, and one-click remediation | pfSense, Splunk, n8n, TheHive, VirusTotal API, Slack, Flask, Impacket, Hydra | Advanced |
+| [SOC Automation — Splunk · TheHive · SOAR](./SOC-Automation-with-Splunk-TheHive-SOAR/) | Cloud SOC lab — endpoint telemetry, credential dumping detection, automated hash enrichment, case creation and analyst notification | Splunk, Sysmon, Shuffle, VirusTotal, TheHive | Intermediate |
 | [Elastic SIEM Home Lab](./elastic-siem/) | Log collection, threat simulation, custom alerting | Elastic Stack, Kali Linux, Nmap, KQL | Beginner |
 | [Automated Phishing Detection](./phishing-detection/) | AI-powered email triage pipeline | Splunk, n8n, ChatGPT API, Slack | Intermediate |
 | [AWS Incident Response](./aws-incident-response/) | Cloud IR — CloudTrail analysis, IAM investigation | AWS CLI, jq, CloudTrail | Intermediate |
@@ -19,7 +19,7 @@ Each lab is fully documented with tools, commands, configurations, findings, and
 
 ## 🛠️ Skills Demonstrated
 
-- **SOC automation & orchestration** — n8n workflows, Splunk webhook alerts, multi-branch incident pipelines
+- **SOC automation & orchestration** — Shuffle/n8n workflows, Splunk webhook alerts, multi-branch incident pipelines
 - **Firewall & network segmentation** — pfSense interface configuration, firewall rules, VPC design
 - **SIEM deployment and detection engineering** — Elastic Stack, Splunk SPL, KQL, custom saved searches
 - **Threat intelligence enrichment** — VirusTotal API v3, IOC classification, TheHive observables
@@ -36,6 +36,9 @@ Each lab is fully documented with tools, commands, configurations, findings, and
 ```
 Cyber-Security-Labs/
 ├── Automation-SOC/
+│   ├── README.md
+│   └── screenshots/
+├── SOC-Automation-with-Splunk-TheHive-SOAR/
 │   ├── README.md
 │   └── screenshots/
 ├── elastic-siem/
