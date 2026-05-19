@@ -10,6 +10,7 @@ Each lab is fully documented with tools, commands, configurations, findings, and
 |---------|-------|-------|------------|
 | [Automated SOC Pipeline](./Automation-SOC/) | End-to-end SOC automation — threat detection, IOC enrichment, case management, and one-click remediation | pfSense, Splunk, n8n, TheHive, VirusTotal API, Slack, Flask, Impacket, Hydra | Advanced |
 | [SOC Automation — Splunk · TheHive · SOAR](./SOC-Automation-with-Splunk-TheHive-SOAR/) | Cloud SOC lab — endpoint telemetry, credential dumping detection, automated hash enrichment, case creation and analyst notification | Splunk, Sysmon, Shuffle, VirusTotal, TheHive | Intermediate |
+| [Automated Active Directory Response](./Automated-Active-Directory-Response/) | Unauthorized RDP detection with automated analyst approval flow and Active Directory account disabling via LDAP | Splunk, Shuffle, Flask, ldap3, Active Directory, Slack, Vultr | Intermediate |
 | [Elastic SIEM Home Lab](./elastic-siem/) | Log collection, threat simulation, custom alerting | Elastic Stack, Kali Linux, Nmap, KQL | Beginner |
 | [Automated Phishing Detection](./phishing-detection/) | AI-powered email triage pipeline | Splunk, n8n, ChatGPT API, Slack | Intermediate |
 | [AWS Incident Response](./aws-incident-response/) | Cloud IR — CloudTrail analysis, IAM investigation | AWS CLI, jq, CloudTrail | Intermediate |
@@ -23,8 +24,8 @@ Each lab is fully documented with tools, commands, configurations, findings, and
 - **Firewall & network segmentation** — pfSense interface configuration, firewall rules, VPC design
 - **SIEM deployment and detection engineering** — Elastic Stack, Splunk SPL, KQL, custom saved searches
 - **Threat intelligence enrichment** — VirusTotal API v3, IOC classification, TheHive observables
-- **Active Directory attack simulation & detection** — Kerberoasting (T1558.003), RDP brute force (T1110.001), Event ID analysis
-- **Automated incident response** — Flask remediation API, PowerShell AD actions triggered from Slack
+- **Active Directory attack simulation & detection** — Kerberoasting (T1558.003), RDP brute force (T1110.001), Event ID analysis, automated LDAP-based account remediation
+- **Automated incident response** — Flask remediation API, LDAP account disabling, human-in-the-loop analyst approval via email
 - **Cloud incident response** — CloudTrail log analysis, IAM investigation (AWS)
 - **Windows malware static analysis** — PE structure, imports, strings, sandbox evasion indicators
 - **MITRE ATT&CK mapping** across all labs
@@ -41,6 +42,11 @@ Cyber-Security-Labs/
 ├── SOC-Automation-with-Splunk-TheHive-SOAR/
 │   ├── README.md
 │   └── screenshots/
+├── Automated-Active-Directory-Response/
+│   ├── README.md
+│   ├── ldap_api/
+│   │   └── ldap_api.py
+│   └── screenshots/
 ├── elastic-siem/
 │   ├── README.md
 │   └── screenshots/
@@ -54,7 +60,3 @@ Cyber-Security-Labs/
     ├── README.md
     └── screenshots/
 ```
-
----
-
-<p align="center">Built by <a href="https://github.com/salsabilmoumni">salsabilmoumni</a></p>
