@@ -218,7 +218,7 @@ The webhook URI (e.g. `https://shuffler.io/api/v1/hooks/webhook_...`) is pasted 
 
 The SOC analyst receives this notification immediately in Slack:
 
-![Slack alert notification received](screenshots/10.png)
+![Slack alert notification received](screenshots/20.png)
 
 ---
 
