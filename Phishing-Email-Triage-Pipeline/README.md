@@ -370,7 +370,7 @@ return [{ json: {
 #### 6. AbuseIPDB (HTTP Request)
 
 - **Method:** GET
-- **URL:** `https://api.abuseipdb.com/api/v2/check?ipAddress={{ $json.sender_ip }}&maxAgeInDays=90`
+- **URL:** `https://api.abuseipdb.com/api/v2/check?ipAddress={{ $json.sender_ip }}`
 - **Auth:** Header Auth (API key)
 
 ![AbuseIPDB Node](screenshots/18.png)
