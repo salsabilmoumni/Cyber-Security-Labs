@@ -390,8 +390,7 @@ return [{ json: {
 - **Body:**
 ```json
 {
-  "url": "{{ $json.link_url }}",
-  "visibility": "private"
+  "url": "{{ $json.link_url }}"
 }
 ```
 
