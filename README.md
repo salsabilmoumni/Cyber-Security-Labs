@@ -10,6 +10,7 @@ Each lab is fully documented with tools, commands, configurations, findings, and
 |---------|-------|-------|------------|
 | [Automated SOC Pipeline](./Automation-SOC/) | End-to-end SOC automation — threat detection, IOC enrichment, case management, and one-click remediation | pfSense, Splunk, n8n, TheHive, VirusTotal API, Slack, Flask, Impacket, Hydra | Advanced |
 | [AI-Powered SOC Pipeline — Splunk · Gemini · DFIR-IRIS](./AI-Powered-SOC-Automation/) | Fully automated Tier 1 SOC pipeline — MITRE ATT&CK detection via Atomic Red Team, AI triage with Google Gemini, VirusTotal hash enrichment, Slack alerting, and automatic DFIR-IRIS case creation | Splunk, Sysmon, Atomic Red Team, n8n, Google Gemini, VirusTotal, DFIR-IRIS, Slack | Advanced |
+| [Sigma-YARA-SOC-Automation-Pipeline](./Sigma-YARA-SOC-Automation-Pipeline/) | Fully automated SOC triage pipeline — suspicious `.exe` detection via Sysmon, YARA file scanning, SigmaHQ rule fetch, AI-generated SPL hunt queries, VirusTotal IOC enrichment, and automatic incident creation in Jira + IRIS DFIR | n8n, Splunk, Sysmon, YARA, SigmaHQ, OpenAI GPT-4, VirusTotal, IRIS DFIR, Jira | Advanced |
 | [SOC Automation — Splunk · TheHive · SOAR](./SOC-Automation-with-Splunk-TheHive-SOAR/) | Cloud SOC lab — endpoint telemetry, credential dumping detection, automated hash enrichment, case creation and analyst notification | Splunk, Sysmon, Shuffle, VirusTotal, TheHive | Intermediate |
 | [Automated Active Directory Response](./Automated-Active-Directory-Response/) | Unauthorized RDP detection with automated analyst approval flow and Active Directory account disabling via LDAP | Splunk, Shuffle, Flask, ldap3, Active Directory, Slack, Vultr | Intermediate |
 | [Elastic SIEM Home Lab](./elastic-siem/) | Log collection, threat simulation, custom alerting | Elastic Stack, Kali Linux, Nmap, KQL | Beginner |
@@ -22,7 +23,8 @@ Each lab is fully documented with tools, commands, configurations, findings, and
 ## 🛠️ Skills Demonstrated
 
 - **SOC automation & orchestration** — Shuffle/n8n workflows, Splunk webhook alerts, multi-branch incident pipelines
-- **AI-assisted threat analysis** — Google Gemini as Tier 1 SOC analyst, structured JSON incident reports, automated escalation decisions
+- **AI-assisted threat analysis** — OpenAI GPT-4 and Google Gemini as Tier 1 SOC analysts, AI-generated SPL hunt queries, structured triage verdicts, automated escalation decisions
+- **YARA & Sigma rule-based detection** — File scanning against custom YARA signatures, SigmaHQ community rule fetching and SPL conversion
 - **Firewall & network segmentation** — pfSense interface configuration, firewall rules, VPC design
 - **SIEM deployment and detection engineering** — Elastic Stack, Splunk SPL, KQL, custom saved searches
 - **Threat intelligence enrichment** — VirusTotal API v3, IOC classification, TheHive observables, SHA256 hash reputation
@@ -42,6 +44,9 @@ Cyber-Security-Labs/
 │   ├── README.md
 │   └── screenshots/
 ├── AI-Powered-SOC-Automation/
+│   ├── README.md
+│   └── screenshots/
+├── Sigma-Yara-SOC-Automation-Pipeline/
 │   ├── README.md
 │   └── screenshots/
 ├── SOC-Automation-with-Splunk-TheHive-SOAR/
